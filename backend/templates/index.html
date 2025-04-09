@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>UniProt to PDB Finder</title>
+</head>
+<body>
+  <h2>🔍 UniProt → PDB 조회기</h2>
+  <input type="text" id="uniprotInput" placeholder="예: P00533">
+  <button onclick="fetchPDBs()">검색</button>
+
+  <h3>📄 관련 PDB ID:</h3>
+  <ul id="pdbList"></ul>
+
+  <script>
+    async function fetchPDBs() {
+      const uniprot = document.getElementById("uniprotInput").value;
+      const res = await fetch(`/get_pdbs?uniprot_id=${uniprot}`);
+      const pdbs = await res.json();
+      const list = document.getElementById("pdbList");
+      list.innerHTML = "";
+
+      if (pdbs.length === 0) {
+        list.innerHTML = "<li>❌ 관련 PDB ID 없음</li>";
+        return;
+      }
+
+      pdbs.forEach(pdb => {
+        const li = document.createElement("li");
+        li.textContent = pdb;
+        list.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
