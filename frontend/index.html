@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cross Docking Tool</title>
+</head>
+<body>
+  <h2>🧬 Cross Docking File Downloader</h2>
+  <input type="text" id="uniprotInput" placeholder="Enter UniProt ID (e.g. P00533)">
+  <button onclick="fetchPDBs()">Search</button>
+
+  <h3>PDB IDs:</h3>
+  <ul id="pdbList"></ul>
+
+  <script>
+    async function fetchPDBs() {
+      const uniprot = document.getElementById("uniprotInput").value;
+      const res = await fetch(`/get_pdbs?uniprot_id=${uniprot}`);
+      const pdbs = await res.json();
+      const list = document.getElementById("pdbList");
+      list.innerHTML = "";
+
+      pdbs.forEach(pdb => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${pdb}
+          <button onclick="downloadFile('/download_pdb?pdb_id=${pdb}')">Download PDB</button>
+          <input type="text" placeholder="Ligand name" id="lig_${pdb}">
+          <button onclick="downloadLigand('${pdb}')">Download SDF</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function downloadFile(url) {
+      window.open(url, "_blank");
+    }
+
+    function downloadLigand(pdb) {
+      const ligand = document.getElementById(`lig_${pdb}`).value;
+      if (ligand.trim() !== "") {
+        downloadFile(`/download_sdf?ligand_id=${ligand}`);
+      } else {
+        alert("Please enter a ligand name!");
+      }
+    }
+  </script>
+</body>
+</html>
